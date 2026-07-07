@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: stg_ons__balanco_energia_subsistema
+    description: >
+      Staging model for the ONS energy balance dataset (hourly load and
+      generation by source, per subsystem). Includes SIN (national aggregate).
+    columns:
+      - name: subsystem_code
+        description: "Subsystem code: N, NE, SE, S, or SIN (national aggregate)."
+        tests:
+          - accepted_values:
+              values: ['N', 'NE', 'SE', 'S', 'SIN']
+      - name: reading_at
+        description: "Hourly timestamp of the reading."
+        tests:
+          - not_null
+      - name: is_national_aggregate
+        description: "True when subsystem_code = 'SIN' (not a real subsystem)."
+        tests:
+          - not_null
+
+  - name: stg_ons__cmo_semi_horario
+    description: >
+      Staging model for the ONS Marginal Operation Cost (CMO) dataset,
+      half-hourly, per subsystem. No national aggregate row here.
+    columns:
+      - name: subsystem_code
+        description: "Subsystem code: N, NE, SE, or S (no SIN in this dataset)."
+        tests:
+          - accepted_values:
+              values: ['N', 'NE', 'SE', 'S']
+      - name: reading_at
+        description: "Half-hourly timestamp of the reading."
+        tests:
+          - not_null
+      - name: marginal_cost_per_mwh
+        description: "Marginal Operation Cost in R$/MWh."
+        tests:
+          - not_null
+
+  - name: int_ons__energy_balance_with_cost
+    description: >
+      Energy balance joined with hourly-aggregated CMO, per subsystem/hour.
+      Excludes the SIN national aggregate row (CMO has no equivalent).
+    columns:
+      - name: subsystem_code
+        description: "Subsystem code: N, NE, SE, or S."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['N', 'NE', 'SE', 'S']
+      - name: reading_at
+        description: "Hourly timestamp of the reading."
+        tests:
+          - not_null
+      # marginal_cost_per_mwh is intentionally NOT tested as not_null yet:
+      # there's a known ~768-row completeness gap in the CMO source dataset
+      # (documented during schema inspection), so some hours may legitimately
+      # have a null cost until that gap is investigated further.

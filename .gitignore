@@ -1,0 +1,21 @@
+# Raw data (large, reproducible via download_ons_data.py)
+data/
+
+# dbt
+2_ons_energy_cicd/target/
+2_ons_energy_cicd/dbt_packages/
+2_ons_energy_cicd/logs/
+
+# Python virtual environment
+venv_dbt/
+__pycache__/
+*.pyc
+
+# Credentials -- never commit these
+*.json
+!package-lock.json
+.env
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,52 @@
+name: dbt CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  dbt-build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: 2_ons_energy_cicd
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dbt
+        run: pip install dbt-bigquery
+
+      - name: Write service account key file
+        run: echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > $HOME/gcp-key.json
+
+      - name: Write dbt profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << PROFILE_EOF
+          ons_energy_pipeline:
+            target: ci
+            outputs:
+              ci:
+                type: bigquery
+                method: service-account
+                project: ons-energy-pipeline
+                dataset: dbt_ci
+                threads: 4
+                keyfile: $HOME/gcp-key.json
+          PROFILE_EOF
+
+      - name: dbt deps
+        run: dbt deps
+
+      - name: dbt build
+        run: dbt build

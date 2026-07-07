@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: raw_ons
+    database: ons-energy-pipeline  # match PROJECT_ID from load_to_bigquery.py
+    schema: raw_ons
+    tables:
+      - name: balanco_energia_subsistema
+        description: >
+          Hourly load and generation by source (hydro, thermal, wind, solar),
+          per subsystem. Includes a "SIN" row that is a pre-aggregated
+          national total, not an actual subsystem.
+      - name: cmo_semi_horario
+        description: >
+          Marginal Operation Cost (CMO), half-hourly, per subsystem.
+          No national aggregate row (subsystem-level only).
