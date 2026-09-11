@@ -13,6 +13,7 @@ __pycache__/
 
 # Credentials -- never commit these
 *.json
+!assets/themes/*.json
 !package-lock.json
 .env
 
