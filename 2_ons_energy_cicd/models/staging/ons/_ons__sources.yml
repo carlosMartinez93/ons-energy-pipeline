@@ -10,6 +10,11 @@ sources:
           Hourly load and generation by source (hydro, thermal, wind, solar),
           per subsystem. Includes a "SIN" row that is a pre-aggregated
           national total, not an actual subsystem.
+      - name: balanco_energia_subsistema_historico
+        description: >
+          Same dataset as balanco_energia_subsistema, but multi-year (loaded by
+          load_balanco_historico_to_bigquery.py). Feeds only the monthly generation
+          mart; kept separate so the CMO cost mart (2024 only) is unaffected.
       - name: cmo_semi_horario
         description: >
           Marginal Operation Cost (CMO), half-hourly, per subsystem.

@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: stg_ons__balanco_energia_historico
+    description: >
+      Staging for the multi-year ONS energy balance (hourly, per subsystem).
+      Separate from stg_ons__balanco_energia_subsistema (2024 only, feeds the CMO mart).
+    columns:
+      - name: subsystem_code
+        description: "Subsystem code: N, NE, SE, S, or SIN (national aggregate)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['N', 'NE', 'SE', 'S', 'SIN']
+      - name: reading_at
+        description: "Hourly timestamp of the reading."
+        tests:
+          - not_null
+
+  - name: mart_ons__monthly_generation_by_source
+    description: >
+      Monthly generation (GWh) by source per subsystem, multi-year. Source: ONS open data,
+      "Balanço de Energia nos Subsistemas". Sources available are only hydro, thermal, wind
+      and solar; the thermal bucket is not split by fuel in this dataset.
+    columns:
+      - name: subsystem_code
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['N', 'NE', 'SE', 'S', 'SIN']
+      - name: reference_month
+        description: "First day of the month."
+        tests:
+          - not_null
+      - name: hours_count
+        description: "Number of hourly readings found for the month (a full month has days*24)."
+        tests:
+          - not_null
+      - name: total_generation_gwh
+        tests:
+          - not_null
